@@ -1,0 +1,111 @@
+/* Design Token System & Custom Styles for MrikiPOS AI Assistant */
+
+:root {
+  /* Brand & Color Tokens - MrikiPOS Emerald Theme */
+  --ai-primary-50: #ecfdf5;
+  --ai-primary-100: #d1fae5;
+  --ai-primary-500: #10b981;
+  --ai-primary-600: #059669;
+  --ai-primary-700: #047857;
+  --ai-primary-800: #065f46;
+  --ai-primary-900: #064e3b;
+
+  /* Surface & Neutral Colors */
+  --ai-bg-surface: #ffffff;
+  --ai-bg-chat: #f8faf9;
+  --ai-bg-user-msg: var(--ai-primary-700);
+  --ai-bg-bot-msg: #f0f4f1;
+
+  /* Text Colors */
+  --ai-text-main: #0f172a;
+  --ai-text-muted: #64748b;
+  --ai-text-inverse: #ffffff;
+
+  /* Border & Divider */
+  --ai-border: #e2e8f0;
+  --ai-border-accent: #a7f3d0;
+
+  /* Elevation & Shadows */
+  --ai-shadow-fab: 0 10px 25px -5px rgba(4, 120, 87, 0.4), 0 8px 10px -6px rgba(4, 120, 87, 0.2);
+  --ai-shadow-panel: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+  /* Animation Timings */
+  --ai-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ai-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Mode Tokens */
+[data-theme="dark"] .ai-chat-panel,
+.dark .ai-chat-panel {
+  --ai-bg-surface: #0f172a;
+  --ai-bg-chat: #1e293b;
+  --ai-bg-bot-msg: #334155;
+  --ai-text-main: #f8fafc;
+  --ai-text-muted: #94a3b8;
+  --ai-border: #334155;
+  --ai-border-accent: #059669;
+}
+
+/* Keyframe Animations */
+@keyframes aiSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes aiPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes aiBounceDot {
+  0%, 80%, 100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Utility Classes */
+.ai-slide-up {
+  animation: aiSlideUp var(--ai-transition-normal) forwards;
+}
+
+.ai-pulse-glow {
+  animation: aiPulseGlow 3s infinite;
+}
+
+.typing-dot {
+  animation: aiBounceDot 1.4s infinite ease-in-out both;
+}
+
+/* Custom Scrollbar */
+.ai-chat-panel ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.ai-chat-panel ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-chat-panel ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+.ai-chat-panel ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}
