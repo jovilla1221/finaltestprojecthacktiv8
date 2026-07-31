@@ -94,3 +94,28 @@ export class AiAssistantController {
     };
   }
 }
+
+/**
+ * Controller khusus Public / Demo AI Assistant (tanpa JWT Guard untuk pengujian UI/Frontend demo)
+ */
+@Controller('v1/public-ai')
+export class AiPublicAssistantController {
+  constructor(private readonly aiService: AiAssistantService) {}
+
+  @Post('chat')
+  async publicChat(@Body() dto: { message: string }) {
+    // Context user demo
+    const mockUser = {
+      id: 'demo-user-1',
+      tenant_id: 'tenant-demo',
+      outlet_id: 'outlet-demo',
+      role: 'OWNER',
+    };
+    const result = await this.aiService.chat({ message: dto.message }, mockUser);
+    return {
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString(),
+    };
+  }
+}

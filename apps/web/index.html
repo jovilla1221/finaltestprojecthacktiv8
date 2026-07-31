@@ -297,16 +297,7 @@
                   <span class="text-[10px] text-emerald-400 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Tanya &rarr;</span>
                 </button>
             </div>
-
-            <div>
-              <p class="text-[11px] font-semibold text-slate-400 mb-1.5 flex items-center gap-1">
-                <i data-lucide="key" class="h-3.5 w-3.5 text-emerald-400"></i> Gemini API Key
-              </p>
-              <div class="space-y-1.5">
-                <input type="password" id="geminiApiKey" placeholder="Paste API Key Gemini Anda di sini..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl transition-all placeholder:text-slate-500 outline-none">
-                <p class="text-[9px] text-slate-500 text-left mt-1">Key tidak akan disimpan. Wajib diisi untuk simulasi AI.</p>
-              </div>
-            </div>
+          </div>
         </div>
       </div>
 
@@ -412,58 +403,30 @@
       chatContainer.appendChild(typingIndicator);
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
-      // Real Gemini API Fetch
+      // NestJS Backend API Fetch
       setTimeout(async () => {
-        const apiKeyInput = document.getElementById('geminiApiKey');
-        const apiKey = apiKeyInput ? apiKeyInput.value.trim() : "";
-        
         const typing = document.getElementById('typingIndicator');
         let responseHtml = '';
 
-        if (!apiKey) {
-           responseHtml = `<p class="text-rose-400">Silakan masukkan Gemini API Key Anda di form pengaturan atas terlebih dahulu.</p>`;
-           if (typing) typing.remove();
-           
-           const botBubble = document.createElement('div');
-           botBubble.className = 'flex justify-start mb-3';
-           botBubble.innerHTML = `
-             <div class="max-w-[85%] rounded-2xl rounded-bl-xs bg-slate-900 border border-slate-800 text-slate-100 px-4 py-3 text-xs leading-relaxed shadow-sm">
-               ${responseHtml}
-               <div class="mt-2.5 pt-1.5 border-t border-slate-800/60 flex items-center justify-between text-[9px] text-slate-500">
-                 <span>Baru saja • Sistem</span>
-               </div>
-             </div>
-           `;
-           chatContainer.appendChild(botBubble);
-           chatContainer.scrollTop = chatContainer.scrollHeight;
-           return;
-        }
-
-        // --- Fetch Real Gemini API ---
+        // --- Fetch NestJS Backend API (Safe with .env) ---
         try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                systemInstruction: {
-                  parts: [{ 
-                    text: "Anda adalah Asisten AI cerdas untuk aplikasi kasir digital MrikiPOS. Berikan jawaban yang profesional, ramah, dan ringkas menggunakan Markdown. Saat ini, Anda memiliki akses ke data realtime MrikiPOS berikut (Gunakan data ini HANYA jika pengguna menanyakan omzet, laporan, transaksi, atau stok):\n\nDATA REALTIME HARI INI:\n- Total Omzet Hari Ini: Rp 3.450.000\n- Total Transaksi: 42 transaksi selesai\n- Produk Paling Laris: Kopi Susu Aren (15 item terjual)\n- Stok Menipis: Gula Pasir (sisa 2 kg), Susu UHT (sisa 3 liter)\n\nInstruksi Tambahan: Jika ditanya tentang penjualan atau omzet, buatkan tabel ringkasan atau bullet points yang rapi dan menarik." 
-                  }]
-                },
-                contents: [{ parts: [{ text: text }] }]
-              })
-            });
-            const data = await res.json();
-            if (data.error) {
-              responseHtml = `<p class="text-rose-400">Error dari Gemini: ${escapeHtml(data.error.message)}</p>`;
-            } else {
-              const reply = data.candidates[0].content.parts[0].text;
-              // Parse full GFM Markdown using marked.js
-              const formattedMarkdown = typeof marked !== 'undefined' ? marked.parse(reply) : reply;
-              responseHtml = `<div class="prose-ai">${formattedMarkdown}</div>`;
-            }
-          } catch (err) {
-           responseHtml = `<p class="text-rose-400">Gagal terhubung ke Gemini API: ${err.message}</p>`;
+          const res = await fetch('http://localhost:4000/v1/public-ai/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+          });
+          
+          const json = await res.json();
+          if (!json.success || json.error) {
+            responseHtml = `<p class="text-rose-400">Backend Error: ${escapeHtml(json.error || json.message || 'Gagal memproses pesan')}</p>`;
+          } else {
+            const reply = json.data.response;
+            // Parse full GFM Markdown using marked.js
+            const formattedMarkdown = typeof marked !== 'undefined' ? marked.parse(reply) : reply;
+            responseHtml = `<div class="prose-ai">${formattedMarkdown}</div>`;
+          }
+        } catch (err) {
+          responseHtml = `<p class="text-rose-400">Gagal terhubung ke NestJS Backend (Port 4000): ${err.message}. Pastikan server backend sudah berjalan.</p>`;
         }
 
         if (typing) typing.remove();
@@ -474,7 +437,7 @@
           <div class="max-w-[85%] rounded-2xl rounded-bl-xs bg-slate-900 border border-slate-800 text-slate-100 px-4 py-3 text-xs leading-relaxed shadow-sm">
             ${responseHtml}
             <div class="mt-2.5 pt-1.5 border-t border-slate-800/60 flex items-center justify-between text-[9px] text-slate-500">
-              <span>Baru saja • Gemini API</span>
+              <span>Baru saja • NestJS Backend</span>
             </div>
           </div>
         `;
