@@ -11,3 +11,9 @@ dist/
 build/
 .next/
 *.log
+.venv/
+venv/
+__pycache__/
+*.db-shm
+*.db-wal
+*.session
